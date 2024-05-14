@@ -3,8 +3,15 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Text} from 'react-native';
 import {useChatClient} from './useChatClient';
-import {AppProvider} from './AppContext';
-import {ChannelList, Chat, OverlayProvider} from 'stream-chat-expo';
+import {AppProvider, useAppContext} from './AppContext';
+import {
+  ChannelList,
+  Chat,
+  OverlayProvider,
+  Channel,
+  MessageList,
+  MessageInput,
+} from 'stream-chat-expo';
 import {StreamChat} from 'stream-chat';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {chatApiKey, chatUserId} from './chatConfig';
@@ -21,9 +28,32 @@ const sort = {
   last_message_at: -1,
 };
 
-const ChannelListScreen = () => {
+// @ts-ignore
+const ChannelScreen = props => {
+  const {channel} = useAppContext();
+  return (
+    <Channel channel={channel} initialScrollToFirstUnreadMessage>
+      <MessageList />
+      <MessageInput />
+    </Channel>
+  );
+};
+
+const ChannelListScreen = props => {
+  const {setChannel} = useAppContext();
   //@ts-ignore
-  return <ChannelList filters={filters} sort={sort} />;
+  return (
+    <ChannelList
+      onSelect={channel => {
+        const {navigation} = props;
+        setChannel(channel);
+        navigation.navigate('ChannelScreen');
+      }}
+      filters={filters}
+      //@ts-ignore
+      sort={sort}
+    />
+  );
 };
 
 const chatClient = StreamChat.getInstance(chatApiKey);
@@ -39,6 +69,7 @@ const NavigationStack = () => {
       <Chat client={chatClient}>
         <Stack.Navigator>
           <Stack.Screen name="ChannelList" component={ChannelListScreen} />
+          <Stack.Screen name="ChannelScreen" component={ChannelScreen} />
         </Stack.Navigator>
       </Chat>
     </OverlayProvider>

@@ -1,14 +1,19 @@
 // useChatClient.js
-
-import { useEffect, useState } from 'react';
-import { StreamChat } from 'stream-chat';
-import { chatApiKey, chatUserId, chatUserName, chatUserToken } from './chatConfig';
+import {useEffect, useState} from 'react';
+import {StreamChat} from 'stream-chat';
+import {
+  chatApiKey,
+  chatUserId,
+  chatUserName,
+  chatUserToken,
+} from './chatConfig';
 
 const user = {
   id: chatUserId,
   name: chatUserName,
 };
 
+console.log('CHAT API KEY', chatApiKey);
 const chatClient = StreamChat.getInstance(chatApiKey);
 
 export const useChatClient = () => {
@@ -17,7 +22,7 @@ export const useChatClient = () => {
   useEffect(() => {
     const setupClient = async () => {
       try {
-        chatClient.connectUser(user, chatUserToken);
+        await chatClient.connectUser(user, chatUserToken);
         setClientIsReady(true);
 
         // connectUser is an async function. So you can choose to await for it or not depending on your use case (e.g. to show custom loading indicator)
@@ -26,7 +31,9 @@ export const useChatClient = () => {
         // BUT ITS NECESSARY TO CALL connectUser FIRST IN ANY CASE.
       } catch (error) {
         if (error instanceof Error) {
-          console.error(`An error occurred while connecting the user: ${error.message}`);
+          console.error(
+            `An error occurred while connecting the user: ${error.message}`,
+          );
         }
       }
     };
@@ -42,4 +49,3 @@ export const useChatClient = () => {
     clientIsReady,
   };
 };
-
