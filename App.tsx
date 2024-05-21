@@ -31,8 +31,26 @@ const sort = {
 // @ts-ignore
 const ChannelScreen = props => {
   const {channel} = useAppContext();
+
   return (
-    <Channel channel={channel} initialScrollToFirstUnreadMessage>
+    <Channel
+      channel={channel!}
+      //@ts-ignore
+      messageActions={args => {
+        const {message} = args;
+        const actions = [
+          {
+            action: async () => {
+              //@ts-ignore
+              await channel?.markUnread({message_id: message.id});
+            },
+            title: 'Mark Unread',
+            titleStyle: {},
+          },
+        ];
+        return actions;
+      }}
+      initialScrollToFirstUnreadMessage>
       <MessageList />
       <MessageInput />
     </Channel>
